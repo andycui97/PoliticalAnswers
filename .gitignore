@@ -1,1 +1,16 @@
+*#
+*~
+*.#*
+*__pycache__*
+*.egg*
+**/.DS_Store
+*.pyc
+*.swp
+*.swo
+*.model
+*.pickle
+*.eps
 data/
+temp/
+test_data/
+docs/build/*

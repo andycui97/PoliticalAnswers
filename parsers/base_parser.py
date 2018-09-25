@@ -38,9 +38,47 @@ def log_error(e):
     """
     print(e)
 
+def clean_forms():
+    """
+    TODO: clean away everything in a <form></form>
+    """
+    pass
+
+def clean_scripts():
+    """
+    TODO: clean away everything in a <script></script>
+    """
+    pass
+
+def grab_body_highest_header():
+    """
+    TODO: grab all content below the highest <h*> header in the 
+    """
+    pass
+
 def main():
+    """
+    For testing purposes only
+    """
     print(simple_get('https://www.congress.gov/roll-call-votes'))
   
+def list_links(raw_html_text):
+    """
+    Returns all links in the raw html provided by running re.findall on <li> tags.  
+
+    Parameters
+    ----------
+    raw_html_text: text
+        Raw html as text. Does not have to be a complete site or even valid html. 
+
+    Returns
+    ----------
+    res: list
+        List of all substrings of the input that match the list regex. 
+    """
+
+    return re.findall('<li>.*</li>', raw_html_text)
+
 
 if __name__== "__main__":
   main()
