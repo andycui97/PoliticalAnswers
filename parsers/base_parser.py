@@ -1,6 +1,7 @@
 from requests import get
 from requests.exceptions import RequestException
 from contextlib import closing
+import re
 
 def simple_get(url):
     """
@@ -8,6 +9,23 @@ def simple_get(url):
     If the content-type of response is some kind of HTML/XML, return the
     text content, otherwise return None.
     """
+    def is_good_response(resp):
+        """
+        Returns True if the response seems to be HTML, False otherwise.
+        """
+        content_type = resp.headers['Content-Type'].lower()
+        return (resp.status_code == 200 
+                and content_type is not None 
+                and content_type.find('html') > -1)
+
+    def log_error(e):
+        """
+        It is always a good idea to log errors. 
+        This function just prints them, but you can
+        make it do anything.
+        """
+        print(e)
+
     try:
         with closing(get(url, stream=True)) as resp:
             if is_good_response(resp):
@@ -20,51 +38,107 @@ def simple_get(url):
         return None
 
 
-def is_good_response(resp):
-    """
-    Returns True if the response seems to be HTML, False otherwise.
-    """
-    content_type = resp.headers['Content-Type'].lower()
-    return (resp.status_code == 200 
-            and content_type is not None 
-            and content_type.find('html') > -1)
 
 
-def log_error(e):
+def clean_forms(raw_html_text):
     """
-    It is always a good idea to log errors. 
-    This function just prints them, but you can
-    make it do anything.
-    """
-    print(e)
+    Returns cleaned raw html by running re.replace on <form> tags.
+    Note, the first match is actually only on "<form" and not "<form>"
+    Also not that the re.S flag is set to match forms that span multiple lines.   
 
-def clean_forms():
-    """
-    TODO: clean away everything in a <form></form>
-    """
-    pass
+    Parameters
+    ----------
+    raw_html_text: text
+        Raw html as text. Does not have to be a complete site or even valid html, 
+        but is required to have matching sensible <form> tags.
 
-def clean_scripts():
+    Returns
+    ----------
+    res: text
+        Cleaned raw html with any forms matching the regex removed.  
     """
-    TODO: clean away everything in a <script></script>
-    """
-    pass
+    return re.sub('(<form.*?</form>)', '', raw_html_text, flags=re.S)
 
-def grab_body_highest_header():
-    """
-    TODO: grab all content below the highest <h*> header in the 
-    """
-    pass
 
-def main():
+def clean_scripts(raw_html_text):
     """
-    For testing purposes only
+    Returns cleaned raw html by running re.replace on <script> tags.
+    Note, the first match is actually only on "<script" and not "<script>"
+    Also not that the re.S flag is set to match forms that span multiple lines.   
+
+    Parameters
+    ----------
+    raw_html_text: text
+        Raw html as text. Does not have to be a complete site or even valid html, 
+        but is required to have matching sensible <script> tags.
+
+    Returns
+    ----------
+    res: text
+        Cleaned raw html with any scripts matching the regex removed.  
     """
-    print(simple_get('https://www.congress.gov/roll-call-votes'))
-  
+    return re.sub('(<script.*?</script>)', '', raw_html_text, flags=re.S)
+
+def remove_header(raw_html_text):
+    """
+    Returns cleaned raw html by running re.replace on <header> tags.
+    Note, the first match is actually only on "<header" and not "<header>"
+    Also not that the re.S flag is set to match forms that span multiple lines.   
+
+    Parameters
+    ----------
+    raw_html_text: text
+        Raw html as text. Does not have to be a complete site or even valid html, 
+        but is required to have matching sensible <header> tags.
+
+    Returns
+    ----------
+    res: text
+        Cleaned raw html with any headers matching the regex removed.  
+    """
+    return re.sub('(<header.*?</header>)', '', raw_html_text, flags=re.S)
+
+def remove_head(raw_html_text):
+    """
+    Returns cleaned raw html by running re.replace on <head> tags.
+    Note, the first match is actually only on "<head" and not "<head>"
+    Also not that the re.S flag is set to match forms that span multiple lines.   
+
+    Parameters
+    ----------
+    raw_html_text: text
+        Raw html as text. Does not have to be a complete site or even valid html, 
+        but is required to have matching sensible <head> tags.
+
+    Returns
+    ----------
+    res: text
+        Cleaned raw html with any heads matching the regex removed.  
+    """
+    return re.sub('(<head.*?</head>)', '', raw_html_text, flags=re.S)
+
+def remove_footer(raw_html_text):
+    """
+    Returns cleaned raw html by running re.replace on <footer> tags.
+    Note, the first match is actually only on "<footer" and not "<footer>"
+    Also not that the re.S flag is set to match forms that span multiple lines.   
+
+    Parameters
+    ----------
+    raw_html_text: text
+        Raw html as text. Does not have to be a complete site or even valid html, 
+        but is required to have matching sensible <footer> tags.
+
+    Returns
+    ----------
+    res: text
+        Cleaned raw html with any footers matching the regex removed.  
+    """
+    return re.sub('(<footer.*?</footer>)', '', raw_html_text, flags=re.S)
+
 def list_links(raw_html_text):
     """
-    Returns all links in the raw html provided by running re.findall on <li> tags.  
+    Returns all links in a list format in the raw html provided by running re.findall on <li><a href= tags.  
 
     Parameters
     ----------
@@ -77,8 +151,14 @@ def list_links(raw_html_text):
         List of all substrings of the input that match the list regex. 
     """
 
-    return re.findall('<li>.*</li>', raw_html_text)
+    return re.findall('<li><a href=.*?</a></li>', raw_html_text)
 
+
+def main():
+    """
+    For testing purposes only
+    """
+    print(simple_get('https://www.congress.gov/roll-call-votes'))
 
 if __name__== "__main__":
   main()
