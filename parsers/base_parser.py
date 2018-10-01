@@ -69,18 +69,20 @@ def main():
 
 def list_links(raw_html_text):
     """
-    Returns all links in the raw html provided by running re.findall on <li> tags.  
+    Returns all links in the raw html provided.
 
     Parameters
     ----------
     raw_html_text: text
-        Raw html as text. Does not have to be a complete site or even valid html. 
+        Raw html as text. Currently requires valid html. TODO: consider changing that
 
     Returns
     ----------
     res: list
         List of all substrings of the input that match the list regex. 
     """
+
+
     parse = BeautifulSoup(raw_html_text)
     links = []
     for link in parse.findAll('a', attrs={'href': re.compile("^http://")}):
