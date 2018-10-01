@@ -1,6 +1,8 @@
 from requests import get
 from requests.exceptions import RequestException
 from contextlib import closing
+from bs4 import BeautifulSoup
+import re
 
 def simple_get(url):
     """
@@ -60,8 +62,11 @@ def main():
     """
     For testing purposes only
     """
-    print(simple_get('https://www.congress.gov/roll-call-votes'))
-  
+    tmp = simple_get('https://www.congress.gov/roll-call-votes')
+    print(tmp)
+    links = list_links(tmp)
+    print(links)
+
 def list_links(raw_html_text):
     """
     Returns all links in the raw html provided by running re.findall on <li> tags.  
@@ -76,8 +81,11 @@ def list_links(raw_html_text):
     res: list
         List of all substrings of the input that match the list regex. 
     """
-
-    return re.findall('<li>.*</li>', raw_html_text)
+    parse = BeautifulSoup(raw_html_text)
+    links = []
+    for link in parse.findAll('a', attrs={'href': re.compile("^http://")}):
+        links.append(link.get('href'))
+    return links
 
 
 if __name__== "__main__":
