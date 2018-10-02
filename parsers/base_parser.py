@@ -42,102 +42,27 @@ def simple_get(url):
 
 
 
-
-def clean_forms(raw_html_text):
+def remove_type_of_tag(raw_html_text, type_of_tag):
     """
-    Returns cleaned raw html by running re.replace on <form> tags.
-    Note, the first match is actually only on "<form" and not "<form>"
-    Also not that the re.S flag is set to match forms that span multiple lines.   
+    Returns cleaned raw html by removing type_of_tag tags.
+    Examples of usage include removing scripts, footers, headers, and forms. 
 
     Parameters
     ----------
     raw_html_text: text
-        Raw html as text. Does not have to be a complete site or even valid html, 
-        but is required to have matching sensible <form> tags.
+        Raw html as text. Currently requires valid html. TODO: consider changing that
 
     Returns
     ----------
     res: text
-        Cleaned raw html with any forms matching the regex removed.  
+        Cleaned raw html with any matching tags removed.  
     """
-    return re.sub('(<form.*?</form>)', '', raw_html_text, flags=re.S)
 
+    parse = BeautifulSoup(raw_html_text, "lxml")
+    for script in parse(type_of_tag):
+        script.decompose()
+    return str(parse)
 
-def clean_scripts(raw_html_text):
-    """
-    Returns cleaned raw html by running re.replace on <script> tags.
-    Note, the first match is actually only on "<script" and not "<script>"
-    Also not that the re.S flag is set to match forms that span multiple lines.   
-
-    Parameters
-    ----------
-    raw_html_text: text
-        Raw html as text. Does not have to be a complete site or even valid html, 
-        but is required to have matching sensible <script> tags.
-
-    Returns
-    ----------
-    res: text
-        Cleaned raw html with any scripts matching the regex removed.  
-    """
-    return re.sub('(<script.*?</script>)', '', raw_html_text, flags=re.S)
-
-def remove_header(raw_html_text):
-    """
-    Returns cleaned raw html by running re.replace on <header> tags.
-    Note, the first match is actually only on "<header" and not "<header>"
-    Also not that the re.S flag is set to match forms that span multiple lines.   
-
-    Parameters
-    ----------
-    raw_html_text: text
-        Raw html as text. Does not have to be a complete site or even valid html, 
-        but is required to have matching sensible <header> tags.
-
-    Returns
-    ----------
-    res: text
-        Cleaned raw html with any headers matching the regex removed.  
-    """
-    return re.sub('(<header.*?</header>)', '', raw_html_text, flags=re.S)
-
-def remove_head(raw_html_text):
-    """
-    Returns cleaned raw html by running re.replace on <head> tags.
-    Note, the first match is actually only on "<head" and not "<head>"
-    Also not that the re.S flag is set to match forms that span multiple lines.   
-
-    Parameters
-    ----------
-    raw_html_text: text
-        Raw html as text. Does not have to be a complete site or even valid html, 
-        but is required to have matching sensible <head> tags.
-
-    Returns
-    ----------
-    res: text
-        Cleaned raw html with any heads matching the regex removed.  
-    """
-    return re.sub('(<head.*?</head>)', '', raw_html_text, flags=re.S)
-
-def remove_footer(raw_html_text):
-    """
-    Returns cleaned raw html by running re.replace on <footer> tags.
-    Note, the first match is actually only on "<footer" and not "<footer>"
-    Also not that the re.S flag is set to match forms that span multiple lines.   
-
-    Parameters
-    ----------
-    raw_html_text: text
-        Raw html as text. Does not have to be a complete site or even valid html, 
-        but is required to have matching sensible <footer> tags.
-
-    Returns
-    ----------
-    res: text
-        Cleaned raw html with any footers matching the regex removed.  
-    """
-    return re.sub('(<footer.*?</footer>)', '', raw_html_text, flags=re.S)
 
 def list_links(raw_html_text):
     """
@@ -154,7 +79,7 @@ def list_links(raw_html_text):
         List of all substrings of the input that match the list regex. 
     """
 
-    parse = BeautifulSoup(raw_html_text)
+    parse = BeautifulSoup(raw_html_text, "lxml")
     links = []
     for link in parse.findAll('a', attrs={'href': re.compile("^http://")}):
         links.append(link.get('href'))
@@ -165,10 +90,7 @@ def main():
     """
     For testing purposes only
     """
-    tmp = simple_get('https://www.congress.gov/roll-call-votes')
-    print(tmp)
-    links = list_links(tmp)
-    print(links)
+    pass # see congress_house_index_parser
     
 if __name__== "__main__":
   main()

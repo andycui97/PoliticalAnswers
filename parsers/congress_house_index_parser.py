@@ -1,7 +1,10 @@
 from base_parser import *
 
 def clean_page(raw_html):
-    return remove_footer(remove_head(remove_header(clean_scripts(clean_forms(raw_html)))))
+    for tag in ['head', 'header', 'footer', 'form', 'script']:
+        raw_html = remove_type_of_tag(raw_html, tag)
+
+    return raw_html
 
 def main():
     """
