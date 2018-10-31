@@ -58,10 +58,27 @@ def remove_type_of_tag(raw_html_text, type_of_tag):
         Cleaned raw html with any matching tags removed.  
     """
 
-    parse = BeautifulSoup(raw_html_text, "lxml")
+    parse = BeautifulSoup(raw_html_text, "html5")
     for script in parse(type_of_tag):
         script.decompose()
     return str(parse)
+
+def get_first_table(raw_html_text):
+    """
+    Returns first table in remaining html. 
+
+    Parameters
+    ----------
+    raw_html_text: text
+        Raw html as text. Currently requires valid html. TODO: consider changing that
+
+    Returns
+    ----------
+    res: text
+        Cleaned raw html with corresponding to the first table found in the html.  
+    """
+    parse = BeautifulSoup(raw_html_text, "html5")
+    return str(parse.table)
 
 
 def list_links(raw_html_text):
@@ -79,7 +96,7 @@ def list_links(raw_html_text):
         List of all substrings of the input that match the list regex. 
     """
 
-    parse = BeautifulSoup(raw_html_text, "lxml")
+    parse = BeautifulSoup(raw_html_text, "html5")
     links = []
     for link in parse.findAll('a', attrs={'href': re.compile("^http://")}):
         links.append(link.get('href'))
